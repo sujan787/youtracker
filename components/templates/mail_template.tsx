@@ -42,7 +42,7 @@ const MailTemplate = (props: MailType) => {
                         {/* email head section */}
                         <Section className="bg-primary text-center">
                             <Text className=" my-7 text-center text-xl font-bold text-white">
-                               YOUTRACKER
+                               YOU-TRACKER
                             </Text>
                         </Section>
 

@@ -12,7 +12,10 @@ import {
 } from "../../components/ui/select"
 import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
 
+import { BsBookmarkStar } from "react-icons/bs";
+import { BsBookmarkStarFill } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs"
+import { Button } from "@/components/ui/button";
 import { Input } from "../../components/ui/input"
 import React from "react"
 import SubmitButton from "../../components/ui/submit_button"
@@ -23,6 +26,7 @@ import { getUserPlayListsReturnType } from "@/services/playlist_service.DB"
 import { redirect } from 'next/navigation'
 import { useForm } from "react-hook-form"
 import { useGlobalState } from "../../components/hooks/use-global-state"
+import useLocalStorage from "@/components/hooks/use-local-storage";
 import { useSearchParams } from 'next/navigation'
 
 const VideoSearchBar = React.forwardRef<
@@ -44,16 +48,29 @@ const VideoSearchBar = React.forwardRef<
     })
 
     const [data, setData] = useGlobalState<VideoSearchInput>("search_items", form.getValues())
+
+    const { storedValue, setValue } = useLocalStorage('searchParams', form.getValues());
+
     form.watch((data, { name, type }) => setData(data))
 
     const handleSubmitMutation = useMutation(async (data: VideoSearchInput) => {
         return { redirect_url: `/videos?keyword=${data.keyword}&playlist_id=${data.playlist_id}` }
     })
 
+    const setAsDefaultSearchParams = () => setValue(data)
+
+    const deleteDefaultSearchParams = () => setValue({ "keyword": "", "playlist_id": "" });
+
     React.useEffect(() => {
         if (handleSubmitMutation.data?.redirect_url)
             redirect(handleSubmitMutation.data?.redirect_url)
     }, [handleSubmitMutation.data])
+
+    React.useEffect(() => {
+        if (!storedValue) return;
+        form.setValue("keyword", storedValue.keyword);
+        form.setValue("playlist_id", storedValue.playlist_id);
+    }, [storedValue]);
 
     return (
         <div className={cn("", className)} {...props}>
@@ -72,7 +89,7 @@ const VideoSearchBar = React.forwardRef<
                             control={form.control}
                             name="playlist_id"
                             render={({ field }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value} >
+                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                     <SelectTrigger className=" w-full md:w-[180px] overflow-hidden">
                                         <SelectValue placeholder="Select Playlists" />
                                     </SelectTrigger>
@@ -93,6 +110,20 @@ const VideoSearchBar = React.forwardRef<
                             <SubmitButton isLoading={false} className="w-full">
                                 <BsSearch className="mr-2" /> Search
                             </SubmitButton>
+
+                            {!!(form.getValues("keyword") || form.getValues("playlist_id")) &&
+                                (<div className=" transition duration-500 ease-in-out">
+                                    {!!(storedValue?.keyword || storedValue?.playlist_id) ?
+                                        <Button className="px-1" type="button" variant="ghost" onClick={() => deleteDefaultSearchParams()}>
+                                            <BsBookmarkStarFill size={20} className="text-primary" />
+                                        </Button>
+                                        :
+                                        <Button className="px-1" type="button" variant="ghost" onClick={() => setAsDefaultSearchParams()}>
+                                            <BsBookmarkStar size={20} />
+                                        </Button>
+                                    }
+                                </div>)
+                            }
                         </div>
                     </div>
                 </Form>

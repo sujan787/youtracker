@@ -54,8 +54,8 @@ const VideoCard = React.forwardRef<HTMLDivElement, VideoCardProps>(({ info, clas
                             className="rounded object-cover transition duration-200 ease-in transform sm:hover:scale-105" />
                     </CardContent>
                 </DialogTrigger>
-                <CardFooter className="flex justify-between items-center">
-                    <div className="flex-col items-start py-2 px-1">
+                <CardFooter className="flex justify-between items-start gap-1 py-2 px-1">
+                    <div className="flex flex-col items-start ">
                         <p className=" text-start">{info.title ? info.title.substring(0, 40) : "No Title Found"}</p>
                         <small className=" text-muted-foreground">{info.channel_title}</small>
                     </div>

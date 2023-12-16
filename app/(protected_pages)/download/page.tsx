@@ -8,15 +8,12 @@ import Main from "@/components/ui/Main"
 import SearchInput from "./search-input";
 import SearchResults from "./search-results";
 import { getDownloadSources } from "@/server_actions/download_action";
+import { useSearchParams } from "next/navigation";
 
-interface PageProps {
-    params: { slug: string },
-    searchParams: { url: string }
-}
+const Page = () => {
+    const searchParams = useSearchParams()
 
-
-const Page = ({ params, searchParams }: PageProps) => {
-    const [url, setUrl] = useState<string>(searchParams?.url);
+    const [url, setUrl] = useState<string>(searchParams.get("url") as string);
 
     const downloadSource = useQuery({
         queryKey: [`download_source_${url}`],

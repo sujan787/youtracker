@@ -26,11 +26,12 @@ import { redirect } from 'next/navigation'
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form"
 import { useMutation } from "@tanstack/react-query"
-import useToastError from "@/components/hooks/use-toast-message"
+import useToastMessage from "@/components/hooks/use-toast-message"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 const Page = () => {
-    const [setToasterMessage] = useToastError();
+    const [setToasterMessage] = useToastMessage();
+    
     const { register, handleSubmit, formState: { errors } } = useForm<LogInFormInput>({
         defaultValues: { email: "", password: "" }, resolver: yupResolver(loginSchema)
     })

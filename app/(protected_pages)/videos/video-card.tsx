@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils"
 import { deleteVideo } from "@/server_actions/video_action"
 import { useGlobalState } from "@/components/hooks/use-global-state"
 import { useQueryClient } from "@tanstack/react-query"
-import useToastError from "@/components/hooks/use-toast-message"
+import useToastMessage from "@/components/hooks/use-toast-message"
 
 interface VideoCardProps extends
     React.HTMLAttributes<HTMLDivElement> {
@@ -61,7 +61,7 @@ const VideoCard = React.forwardRef<HTMLDivElement, VideoCardProps>(({ info, clas
                 </DialogTrigger>
                 <CardFooter className="flex justify-between items-start gap-1 py-2 px-1">
                     <div className="flex flex-col items-start ">
-                        <p className=" text-start">{info.title ? info.title.substring(0, 40) : "No Title Found"}</p>
+                        <p className=" text-start">{info.title ? info.title.substring(0, 30) : "No Title Found"}</p>
                         <small className=" text-muted-foreground">{info.channel_title}</small>
                     </div>
                     <Actions className="" info={info} />
@@ -90,27 +90,14 @@ interface ActionProps extends
 }
 
 const Actions = React.forwardRef<HTMLDivElement, ActionProps>(({ info, className, ...props }, ref) => {
-    const [setToasterMessage] = useToastError();
+    const [setToasterMessage] = useToastMessage();
 
     const queryClient = useQueryClient();
     const [data] = useGlobalState<VideoSearchInput>("search_items")
 
     const deleteVideoById = async (videoId: string) => {
         const status = await deleteVideo(videoId)
-
-        const videoQuery = queryClient.getQueryData(
-            ["videos", `${data.keyword}-${data.playlist_id}`]
-        ) as { pages: GetUserVideosReturnType };
-
-        let videos = videoQuery?.pages ?? []
-
-        videos = videos.filter((v) => v?.id != videoId)
-
-        queryClient.setQueryData(
-            ["videos", `${data.keyword}-${data.playlist_id}`],
-            { pages: [status.data, ...videos] }
-        )
-
+        queryClient.invalidateQueries({ queryKey: ["videos"] });
         setToasterMessage(status.message)
     }
 

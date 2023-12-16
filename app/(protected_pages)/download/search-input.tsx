@@ -11,7 +11,7 @@ import { downloadInputSchema } from "@/yup/shema"
 import { extractYouTubeVideoId } from "@/server_actions/video_action"
 import { useForm } from "react-hook-form"
 import { useMutation } from "@tanstack/react-query"
-import useToastError from "@/components/hooks/use-toast-message"
+import useToastMessage from "@/components/hooks/use-toast-message"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 interface SearchInputProps extends
@@ -23,7 +23,7 @@ interface SearchInputProps extends
 
 const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     ({ url, setUrl, isLoading, className, children, ...props }, ref) => {
-        const [setToasterMessage] = useToastError();
+        const [setToasterMessage] = useToastMessage();
 
         const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>();
 

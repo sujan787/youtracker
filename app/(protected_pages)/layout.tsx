@@ -9,7 +9,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         <>
             <UpperNavigationBar />
 
-            <Section className="flex-row">
+            <Section className="flex-row ">
                 <SideNavigationBar />
                 {children}
             </Section>

@@ -10,7 +10,8 @@ import {
     DialogContent,
     DialogTrigger
 } from "@/components/ui/dialog"
-import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
+import { UseQueryResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { deletePlaylist, updatePlaylist } from "@/server_actions/playlist_action"
 
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,7 @@ import { getUserPlayListsReturnType } from "@/services/playlist_service.DB"
 import { getVideos } from "@/server_actions/video_action"
 import { playlistAddSchema } from "@/yup/shema"
 import { useForm } from "react-hook-form"
+import useToastMessage from "@/components/hooks/use-toast-message"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 interface PlaylistCardProps extends
@@ -41,7 +43,9 @@ type PlaylistInput = {
 }
 
 const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ playlist, className, ...props }, ref) => {
-
+    const [setToasterMessage] = useToastMessage();
+    const queryClient = useQueryClient();
+    
     const playlistVideos = useQuery({
         queryKey: [`playlistVideos-${playlist.id}`],
         queryFn: async () => (await getVideos({ playlist_id: playlist.id }, 4))?.data
@@ -52,14 +56,19 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
     })
 
     const handleSubmitMutation = useMutation(async (formData: PlaylistInput) => {
-
+        const status = await updatePlaylist(playlist.id, formData)
+        setIsEditable(false);
+        setToasterMessage(status.message)
+        queryClient.invalidateQueries({ queryKey: ["play-lists"] });
     })
 
     const deletePlaylistMutation = useMutation(async (playlistId: string) => {
-        return;
+        const status = await deletePlaylist(playlist.id)
+        setToasterMessage(status.message)
+        queryClient.invalidateQueries({ queryKey: ["play-lists"] });
     })
 
-    const [isEdit, setIsEdit] = React.useState(false);
+    const [isEditable, setIsEditable] = React.useState(false);
 
     return playlistVideos.data?.length ? (
         <Card ref={ref} className={cn("w-full flex flex-col gap-2 overflow-hidden p-3", className)} {...props}>
@@ -93,7 +102,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
             </CardContent>
 
             <CardFooter className="flex-col items-start py-0 px-0">
-                {isEdit ?
+                {isEditable ?
                     <form onSubmit={handleSubmit((data) => handleSubmitMutation.mutate(data))} className="flex items-center gap-2 w-full">
                         <div className="flex flex-col space-y-1.5 flex-1 ">
                             <Input id="playlist-name " placeholder="Enter the playlist name" {...register("name")} />
@@ -103,7 +112,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
                             <IoCheckmarkDoneOutline size={20} />
                         </SubmitButton>
 
-                        <Button onClick={() => setIsEdit(false)} className="text-muted-foreground" variant="outline">
+                        <Button onClick={() => setIsEditable(false)} className="text-muted-foreground" variant="outline">
                             <IoMdClose size={20} />
                         </Button>
                     </form>
@@ -114,7 +123,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
                         </div>
 
                         <div className="flex gap-2">
-                            <Button onClick={() => setIsEdit(true)}>
+                            <Button onClick={() => setIsEditable(true)}>
                                 <FaRegEdit size={20} />
                             </Button>
 
@@ -129,7 +138,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
             </CardFooter>
         </Card>
 
-    ) : (<PlaylistCardSkeleton/>)
+    ) : (<PlaylistCardSkeleton />)
 })
 
 PlaylistCard.displayName = "PlaylistCard"

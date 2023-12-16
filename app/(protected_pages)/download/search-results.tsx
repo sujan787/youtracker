@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { DownloadSourceType } from "@/services/youtube_api_service"
+import { MdAudiotrack } from "react-icons/md";
 import React from "react"
-import { Separator } from "@/components/ui/separator"
+import { VscMute } from "react-icons/vsc";
+import { VscUnmute } from "react-icons/vsc";
 import { cn } from "@/lib/utils"
-import ytdl from "ytdl-core"
 
 interface SearchResultsProps extends
     React.HTMLAttributes<HTMLDivElement> {
@@ -12,14 +13,6 @@ interface SearchResultsProps extends
 
 const SearchResults = React.forwardRef<HTMLDivElement, SearchResultsProps>(
     ({ downloadSource, className, children, ...props }, ref) => {
-
-        const downloadFromSource = async (url: string) => {
-            try {
-                
-            } catch (error) {
-                console.error('Error downloading video:', error);
-            }
-        }
 
         return (
             <div ref={ref} className={cn("", className)}{...props}>
@@ -32,7 +25,8 @@ const SearchResults = React.forwardRef<HTMLDivElement, SearchResultsProps>(
                             <div className="grid md:grid-cols-7 gap-3 md:gap-5">
                                 {!!downloadSource.video_sources?.length &&
                                     downloadSource.video_sources.map((source, index) => (
-                                        <Button variant="outline" key={index}  className=" text-muted-foreground text-sm">
+                                        <Button variant="outline" key={index} className=" text-muted-foreground text-sm flex items-center gap-1">
+                                            {source.has_audio ? <VscUnmute size={15} /> : <VscMute size={15} />}
                                             <a href={source.url} target="_blank" download="file">{source.type}</a>
                                         </Button>
                                     ))
@@ -46,8 +40,9 @@ const SearchResults = React.forwardRef<HTMLDivElement, SearchResultsProps>(
                             <div className="grid md:grid-cols-7 gap-3 md:gap-5">
                                 {!!downloadSource.audio_sources?.length &&
                                     downloadSource.audio_sources.map((source, index) => (
-                                        <Button variant="outline" key={index}>
-                                            <a href={source.url} target="_blank" download="file" className=" text-muted-foreground text-sm">{source.type}</a>
+                                        <Button variant="outline" key={index} className="flex items-center gap-1 text-muted-foreground text-sm">
+                                            <MdAudiotrack size={15} />
+                                            <a href={source.url} target="_blank" download="file" >{source.type}</a>
                                         </Button>
                                     ))
                                 }

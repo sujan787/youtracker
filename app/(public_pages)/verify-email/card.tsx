@@ -24,7 +24,7 @@ import { emailVerificationSchema } from "@/yup/shema"
 import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { useMutation } from "@tanstack/react-query"
-import useToastError from "@/components/hooks/use-toast-message"
+import useToastMessage from "@/components/hooks/use-toast-message"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 interface CardProps {
@@ -33,7 +33,7 @@ interface CardProps {
 
 const Card: FC<CardProps> = ({ email }) => {
 
-    const [setToasterMessage] = useToastError();
+    const [setToasterMessage] = useToastMessage();
 
     const { handleSubmit, formState: { errors } } = useForm<{ email: string }>({
         defaultValues: { email: email ?? "" },

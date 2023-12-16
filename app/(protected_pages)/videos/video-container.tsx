@@ -45,7 +45,7 @@ const VideoContainer = React.forwardRef<HTMLDivElement, VideoContainerProps>(
             [].concat(...videosQuery.data.pages) : [];
 
         let audioLists = videos.map((video) => {
-            if (!video.download_sources?.audio_sources[0]) return;
+            if (!video?.download_sources?.audio_sources[0]) return;
             return {
                 identifier: video.id,
                 url: `${video.download_sources?.audio_sources[0].url}&uuid=${video.id}`,
@@ -88,8 +88,8 @@ const VideoContainer = React.forwardRef<HTMLDivElement, VideoContainerProps>(
                                 {
                                     videos.map((info, index) => {
                                         return (index === videos.length - 1) ?
-                                            (<VideoCard info={info} key={index} ref={interaction.ref} />) :
-                                            (<VideoCard info={info} key={index} />)
+                                            (info && <VideoCard info={info} key={index} ref={interaction.ref} />) :
+                                            (info && <VideoCard info={info} key={index} />)
                                     })
                                 }
                             </div>
@@ -100,8 +100,8 @@ const VideoContainer = React.forwardRef<HTMLDivElement, VideoContainerProps>(
                                 {
                                     audioLists.map((audio, index) => {
                                         return (index === videos.length - 1) ?
-                                            (<AudioCard info={audio} audioLists={audioLists} key={index} ref={interaction.ref} />) :
-                                            (<AudioCard info={audio} audioLists={audioLists} key={index} />)
+                                            (audio && <AudioCard info={audio} audioLists={audioLists} key={index} ref={interaction.ref} />) :
+                                            (audio && <AudioCard info={audio} audioLists={audioLists} key={index} />)
                                     })
                                 }
                             </div>

@@ -1,3 +1,4 @@
+
 "use server"
 
 import { AddVideoFormInput, ServerActionReturnType, VideoSearchInput } from "@/type"
@@ -6,6 +7,7 @@ import { fetchYoutubeVideoInfo, getYoutubeDownloadSources } from "@/services/you
 
 import { addPlaylist } from "@/services/playlist_service.DB";
 import { addVideo as addVideoIntoDB } from './../services/video_service.DB';
+import { deleteVideo as deleteVideoFromDb } from './../services/video_service.DB';
 import { getUserVideos } from './../services/video_service.DB';
 
 export const saveVideo = async (data: AddVideoFormInput)
@@ -52,6 +54,16 @@ export const getVideos = async (params: VideoSearchInput & { pagination?: number
     : ServerActionReturnType => {
     const videos = await getUserVideos(params, limit)
     return { is_ok: true, data: videos }
+}
+
+export const deleteVideo = async (videoId: string): ServerActionReturnType => {
+    try {
+        await deleteVideoFromDb(videoId);
+    } catch (error) {
+        return { is_ok: false, message: { error: "Failed to delete the video." } }
+    }
+
+    return { is_ok: true, message: { success: "Video has been successfully deleted" } }
 }
 
 // * helper functions

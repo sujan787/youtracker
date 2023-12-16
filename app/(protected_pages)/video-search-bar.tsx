@@ -77,34 +77,22 @@ const VideoSearchBar = React.forwardRef<
             <form onSubmit={form.handleSubmit((data) => handleSubmitMutation.mutate(data))}>
                 <Form {...form}>
                     <div className="w-full flex flex-col md:flex-row justify-center gap-2 ">
-                        <FormField
-                            control={form.control}
-                            name="keyword"
-                            render={({ field }) => (
-                                <Input {...field} type="text" className="w-full md:w-[40%] " placeholder="search..." />
-                            )}
-                        />
+                        <Input {...form.register("keyword")} type="text" className="w-full md:w-[40%] " placeholder="search..." />
 
-                        <FormField
-                            control={form.control}
-                            name="playlist_id"
-                            render={({ field }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                    <SelectTrigger className=" w-full md:w-[180px] overflow-hidden">
-                                        <SelectValue placeholder="Select Playlists" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Playlists</SelectLabel>
-                                            <SelectItem value="">All</SelectItem>
-                                            {playlists.data && playlists.data.map((list) => (
-                                                <SelectItem value={list.id} key={list.id}>{list.name}</SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
+                        <Select onValueChange={(value) => form.setValue("playlist_id", value)} value={data.playlist_id}>
+                            <SelectTrigger className=" w-full md:w-[180px] overflow-hidden">
+                                <SelectValue placeholder="Select Playlists" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Playlists</SelectLabel>
+                                    <SelectItem value="">All</SelectItem>
+                                    {playlists.data && playlists.data.map((list) => (
+                                        <SelectItem value={list.id} key={list.id}>{list.name}</SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
 
                         <div className="flex items-center gap-2">
                             <SubmitButton isLoading={false} className="w-full">

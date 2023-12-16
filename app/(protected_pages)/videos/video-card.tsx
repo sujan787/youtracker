@@ -27,7 +27,12 @@ import Image from "next/image"
 import { IoMdDownload } from "react-icons/io";
 import Link from "next/link"
 import { MdDelete } from "react-icons/md";
+import { VideoSearchInput } from "@/type"
 import { cn } from "@/lib/utils"
+import { deleteVideo } from "@/server_actions/video_action"
+import { useGlobalState } from "@/components/hooks/use-global-state"
+import { useQueryClient } from "@tanstack/react-query"
+import useToastError from "@/components/hooks/use-toast-message"
 
 interface VideoCardProps extends
     React.HTMLAttributes<HTMLDivElement> {
@@ -59,14 +64,14 @@ const VideoCard = React.forwardRef<HTMLDivElement, VideoCardProps>(({ info, clas
                         <p className=" text-start">{info.title ? info.title.substring(0, 40) : "No Title Found"}</p>
                         <small className=" text-muted-foreground">{info.channel_title}</small>
                     </div>
-                    <Actions className="" />
+                    <Actions className="" info={info} />
                 </CardFooter>
             </Card>
 
             <DialogContent className="w-full p-1 rounded-md" >
                 <AspectRatio ratio={16 / 9}>
                     <iframe
-                        src={`https://www.youtube.com/embed/${info.video_id}?rel=0`}
+                        src={`https://www.youtube.com/embed/${info?.video_id}?rel=0`}
                         title="YouTube video" allowFullScreen
                         className="w-full h-full rounded-md"></iframe>
                 </AspectRatio>
@@ -81,20 +86,44 @@ export default VideoCard
 
 interface ActionProps extends
     React.HtmlHTMLAttributes<HTMLDivElement> {
-
+    info: GetUserVideosReturnType[0],
 }
 
-const Actions = React.forwardRef<HTMLDivElement, ActionProps>(({ className, ...props }, ref) => {
+const Actions = React.forwardRef<HTMLDivElement, ActionProps>(({ info, className, ...props }, ref) => {
+    const [setToasterMessage] = useToastError();
+
+    const queryClient = useQueryClient();
+    const [data] = useGlobalState<VideoSearchInput>("search_items")
+
+    const deleteVideoById = async (videoId: string) => {
+        const status = await deleteVideo(videoId)
+
+        const videoQuery = queryClient.getQueryData(
+            ["videos", `${data.keyword}-${data.playlist_id}`]
+        ) as { pages: GetUserVideosReturnType };
+
+        let videos = videoQuery?.pages ?? []
+
+        videos = videos.filter((v) => v?.id != videoId)
+
+        queryClient.setQueryData(
+            ["videos", `${data.keyword}-${data.playlist_id}`],
+            { pages: [status.data, ...videos] }
+        )
+
+        setToasterMessage(status.message)
+    }
+
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className={cn("", className)}>
-                <CgMenuGridR size={25} />
+            <DropdownMenuTrigger className={cn("text-muted-foreground", className)}>
+                <CgMenuGridR size={25} className="mr-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem>
-                    <Link href="/download" className="flex items-center gap-1"><IoMdDownload/>Download</Link>
+                    <Link href={`/download?url=${info.url}`} className="flex items-center gap-1"><IoMdDownload />Download</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-400 flex gap-1"><MdDelete/>Delete</DropdownMenuItem>
+                <DropdownMenuItem className="text-red-400 flex gap-1" onClick={() => deleteVideoById(info.id)}><MdDelete />Delete</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
 

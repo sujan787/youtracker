@@ -9,8 +9,14 @@ import SearchInput from "./search-input";
 import SearchResults from "./search-results";
 import { getDownloadSources } from "@/server_actions/download_action";
 
-const Page = () => {
-    const [url, setUrl] = useState<string>();
+interface PageProps {
+    params: { slug: string },
+    searchParams: { url: string }
+}
+
+
+const Page = ({ params, searchParams }: PageProps) => {
+    const [url, setUrl] = useState<string>(searchParams?.url);
 
     const downloadSource = useQuery({
         queryKey: [`download_source_${url}`],
@@ -28,7 +34,7 @@ const Page = () => {
                 </p>
 
                 <p className="text-muted-foreground text-center mb-4">Download your favorite YT Videos as MP3, MP4, WEBM and more!</p>
-                <SearchInput url={url} setUrl={setUrl} />
+                <SearchInput url={url} setUrl={setUrl} isLoading={downloadSource.isLoading} />
             </div>
             <div>
                 <SearchResults downloadSource={downloadSource.data} />

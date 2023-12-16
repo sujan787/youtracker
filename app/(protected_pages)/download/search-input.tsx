@@ -17,11 +17,12 @@ import { yupResolver } from "@hookform/resolvers/yup"
 interface SearchInputProps extends
     React.HTMLAttributes<HTMLDivElement> {
     url: string | undefined,
-    setUrl: React.Dispatch<React.SetStateAction<string | undefined>>
+    setUrl: React.Dispatch<React.SetStateAction<string>>
+    isLoading: boolean,
 }
 
 const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
-    ({ url, setUrl, className, children, ...props }, ref) => {
+    ({ url, setUrl, isLoading, className, children, ...props }, ref) => {
         const [setToasterMessage] = useToastError();
 
         const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>();
@@ -32,11 +33,21 @@ const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         })
 
         const handleSubmitMutation = useMutation(async (formData: DownloadInput) => {
-            setUrl(formData.url);
             const videoId = await extractYouTubeVideoId(formData.url)
             if (!videoId.length) return { error: "Url Must be a Youtube Url" }
+            setUrl(formData.url);
             setYoutubeVideoId(videoId)
         })
+
+        React.useEffect(() => {
+            const fetchData = async () => {
+                if (!url) return;
+                const videoId = await extractYouTubeVideoId(url);
+                setYoutubeVideoId(videoId);
+            };
+
+            fetchData();
+        }, [url]);
 
         React.useEffect(() => {
             if (!handleSubmitMutation.data) return;
@@ -44,7 +55,6 @@ const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                 return setToasterMessage({ error: handleSubmitMutation.data.error });
             }
         }, [handleSubmitMutation.data])
-
 
         return (
             <div ref={ref} className={cn(" md:px-96", className)}{...props}>
@@ -64,7 +74,7 @@ const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             <Error message={errors.url?.message} />
                         </div>
                         <div className="flex justify-center">
-                            <SubmitButton isLoading={handleSubmitMutation.isLoading} className=" w-60">Submit</SubmitButton>
+                            <SubmitButton isLoading={isLoading} className=" w-60">Submit</SubmitButton>
                         </div>
                     </div>
                 </form>

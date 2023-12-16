@@ -7,11 +7,11 @@ import { getServerSession } from "next-auth"
 import { playlists } from "@/db/schema/playlists"
 
 export type PlayListType = {
-    id: number
+    id?: number
     name: string
 }
 
-type AddPlaylistParamType = {
+export type AddPlaylistParamType = {
     name: string
 }
 
@@ -29,6 +29,7 @@ export const addPlaylist = async (data: AddPlaylistParamType) => {
 
 export const getUserPlayLists = async () => {
     const session = await getServerSession(authOptions) as { user: UserType };
+
     return (await db.query.playlists.findMany({
         where: eq(playlists.user_id, session.user.id),
         orderBy: desc(playlists.created_at)
@@ -37,6 +38,13 @@ export const getUserPlayLists = async () => {
 
 export type getUserPlayListsReturnType = Awaited<ReturnType<typeof getUserPlayLists>>
 
+export const updatePlaylist = async (playlistId: string, data: AddPlaylistParamType) => {
+    await db.update(playlists).set(data).where(eq(playlists.id, playlistId))
+}
+
+export const deletePlaylist = async (playlistId: string) => {
+    await db.delete(playlists).where(eq(playlists.id, playlistId));
+}
 
 
 

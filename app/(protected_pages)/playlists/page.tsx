@@ -1,4 +1,4 @@
-"use client"
+   "use client"
 
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
@@ -15,7 +15,7 @@ const Page = () => {
 
     return (
         <Main className="flex-1">
-            <div className="grid md:grid-cols-4">
+            <div className="grid md:grid-cols-4 gap-3">
                 {playlists.data && playlists.data.map((playlist, index) => (
                     <PlaylistCard key={index} playlist={playlist} />
                 ))}

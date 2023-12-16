@@ -1,3 +1,4 @@
+
 "use server"
 
 import { UserType, VideoSearchInput } from "@/type";
@@ -54,7 +55,7 @@ export const addVideo = async (data: AddVideoParamsType) => {
     const session = await getServerSession(authOptions) as { user: UserType };
     const videoId = crypto.randomUUID();
     // console.log(data);
-    
+
     try {
         await db.insert(videos).values({ id: videoId, ...data, user_id: session.user.id })
     } catch (error) {
@@ -88,6 +89,18 @@ export const addPlaylistVideos = async (videId: string, playlistId: string) => {
     }
 
     return true
+}
+
+export const deletePlaylistVideos = async (playlistId: string) => {
+    const videoIds = await (db.select({ id: videos.id }).from(videos)
+        .leftJoin(playlistVideos, eq(videos.id, playlistVideos.video_id))
+        .where(eq(playlistVideos.playlist_id, playlistId)))
+
+    videoIds.forEach( async (video) => {
+        await db.delete(videos).where(eq(videos.id, video.id))
+    })
+
+    await db.delete(playlistVideos).where(eq(playlistVideos.playlist_id, playlistId))
 }
 
 export const getUserVideos =
@@ -127,3 +140,8 @@ export const getUserVideos =
     }
 
 export type GetUserVideosReturnType = Awaited<ReturnType<typeof getUserVideos>>
+
+
+export const deleteVideo = async (videoId: string) => {
+    await db.delete(videos).where(eq(videos.id, videoId));
+}

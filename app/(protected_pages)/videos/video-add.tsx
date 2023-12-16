@@ -34,6 +34,7 @@ import {
 } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import ClipLoader from "react-spinners/ClipLoader";
 import { DialogClose } from "@radix-ui/react-dialog";
 import Error from "@/components/ui/error";
 import { GetUserVideosReturnType } from "@/services/video_service.DB";
@@ -93,7 +94,18 @@ const VideoAdd = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
             <div ref={ref} className={cn("", className)} {...props}>
                 <Dialog>
                     <DialogTrigger className="hover:bg-accent">
-                        <AiOutlineVideoCameraAdd size={60} className="border p-3 text-muted-foreground rounded shadow" />
+                        {handleSubmitMutation.isLoading ?
+                            <ClipLoader
+                                color={"black"}
+                                loading={handleSubmitMutation.isLoading}
+                                size={20}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            />
+                            :
+                            <AiOutlineVideoCameraAdd size={60} className="border p-3 text-muted-foreground rounded shadow" />
+                        }
+
                     </DialogTrigger>
 
                     <DialogContent className="sm:max-w-[425px]">

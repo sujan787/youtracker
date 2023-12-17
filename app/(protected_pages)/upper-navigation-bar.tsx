@@ -35,15 +35,20 @@ const UpperNavigationBar: FC<UpperNavigationBarProps> = () => {
 
     const searchParams = useSearchParams()
 
-    const [data, setData] = useGlobalState<VideoSearchInput>("search_items", {
-        keyword: searchParams.get('keyword') ?? "",
-        playlist_id: searchParams.get('playlist_id') ?? ""
-    })
+    const [data, setData] = useGlobalState<VideoSearchInput>("search_items", { keyword: "", playlist_id: "" })
 
-    const { storedValue } = useLocalStorage('searchParams', data);
+    const { storedValue, setValue } = useLocalStorage('searchParams', data);
 
     React.useEffect(() => {
-        if (searchParams.get('keyword') || searchParams.get('playlist_id')) return;
+        if (searchParams.get('keyword') || searchParams.get('playlist_id')) {
+            setData({
+                keyword: searchParams.get('keyword') ?? "",
+                playlist_id: searchParams.get('playlist_id') ?? ""
+            })
+
+            return;
+        };
+
         if (!storedValue) return;
         setData(storedValue)
     }, [storedValue]);
@@ -59,7 +64,9 @@ const UpperNavigationBar: FC<UpperNavigationBarProps> = () => {
                 </div>
                 <div className="w-full absolute md:relative bg-popover z-10 md:z-0  top-0 px-3 pt-2 md:p-0">
                     {/* for large and medium screen */}
-                    <div className="hidden md:block"> <VideoSearchBar /></div>
+                    <div className="hidden md:block">
+                        <VideoSearchBar data={data} setData={setData} storedValue={storedValue} setValue={setValue} />
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-between space-x-2 md:justify-end">
@@ -72,7 +79,7 @@ const UpperNavigationBar: FC<UpperNavigationBarProps> = () => {
                             </PopoverTrigger>
 
                             <PopoverContent className="mt-2 mr-1">
-                                <VideoSearchBar />
+                                <VideoSearchBar data={data} setData={setData} storedValue={storedValue} setValue={setValue} />
                             </PopoverContent>
                         </Popover>
                     </div>

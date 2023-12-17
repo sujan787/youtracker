@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-interface SetGlobalState<T> {
+export interface SetGlobalState<T> {
     (newState: T): void;
 }
 

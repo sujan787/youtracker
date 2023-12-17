@@ -34,17 +34,12 @@ const VideoSearchBar = React.forwardRef<
     React.HTMLAttributes<HTMLDivElement>
 >(({ className, title, children, ...props }, ref) => {
 
-    const searchParams = useSearchParams()
-
     const playlists = useQuery({
         queryKey: ["play-lists"], queryFn: async () => (await getAllPlaylists())?.data
     }) as UseQueryResult<getUserPlayListsReturnType>
 
     const form = useForm<VideoSearchInput>({
-        defaultValues: {
-            keyword: searchParams.get('keyword') ?? "",
-            playlist_id: searchParams.get('playlist_id') ?? ""
-        },
+        defaultValues: { keyword: "", playlist_id: "" },
     })
 
     const [data, setData] = useGlobalState<VideoSearchInput>("search_items", form.getValues())
@@ -67,10 +62,17 @@ const VideoSearchBar = React.forwardRef<
     }, [handleSubmitMutation.data])
 
     React.useEffect(() => {
+        if (!data) return;
+        form.setValue("keyword", data.keyword);
+        form.setValue("playlist_id", data.playlist_id);
+    }, [data]);
+
+    React.useEffect(() => {
         if (!storedValue) return;
         form.setValue("keyword", storedValue.keyword);
         form.setValue("playlist_id", storedValue.playlist_id);
     }, [storedValue]);
+
 
     return (
         <div className={cn("", className)} {...props}>

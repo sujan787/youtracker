@@ -3,10 +3,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { Button, buttonVariants } from "../../components/ui/button";
 import {
-     DropdownMenu,
-     DropdownMenuContent,
-     DropdownMenuItem,
-     DropdownMenuTrigger
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
 } from "../../components/ui/dropdown-menu";
 import {
     Popover,
@@ -20,14 +20,34 @@ import Link from "next/link";
 import React from "react";
 import ThemeToggler from "../../components/ui/theme-toggler";
 import VideoSearchBar from "./video-search-bar";
+import { VideoSearchInput } from "@/type";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { useGlobalState } from "@/components/hooks/use-global-state";
+import useLocalStorage from "@/components/hooks/use-local-storage";
+import { useSearchParams } from "next/navigation";
 
 interface UpperNavigationBarProps {
 }
 
 
 const UpperNavigationBar: FC<UpperNavigationBarProps> = () => {
+
+    const searchParams = useSearchParams()
+
+    const [data, setData] = useGlobalState<VideoSearchInput>("search_items", {
+        keyword: searchParams.get('keyword') ?? "",
+        playlist_id: searchParams.get('playlist_id') ?? ""
+    })
+
+    const { storedValue } = useLocalStorage('searchParams', data);
+
+    React.useEffect(() => {
+        if (searchParams.get('keyword') || searchParams.get('playlist_id')) return;
+        if (!storedValue) return;
+        setData(storedValue)
+    }, [storedValue]);
+
     return (
         <header className='supports-backdrop-blur:bg-background/60 sticky top-0 z-40 w-full 
         border-b bg-background/95 backdrop-blur md:px-5'>
@@ -41,16 +61,22 @@ const UpperNavigationBar: FC<UpperNavigationBarProps> = () => {
                     {/* for large and medium screen */}
                     <div className="hidden md:block"> <VideoSearchBar /></div>
                 </div>
+
                 <div className="flex items-center justify-between space-x-2 md:justify-end">
                     {/* for small screen */}
                     <div className="md:hidden block">
                         <Popover>
                             <PopoverTrigger className={cn(buttonVariants(),
                                 "border border-input bg-background hover:bg-accent hover:text-accent-foreground text-accent-foreground")}>
-                                <BsSearch /></PopoverTrigger>
-                            <PopoverContent className="mt-2 mr-1"><VideoSearchBar /></PopoverContent>
+                                <BsSearch />
+                            </PopoverTrigger>
+
+                            <PopoverContent className="mt-2 mr-1">
+                                <VideoSearchBar />
+                            </PopoverContent>
                         </Popover>
                     </div>
+
                     <ThemeToggler />
                     <ProfileDropDown />
                 </div>

@@ -22,6 +22,7 @@ import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
+import Link from "next/link"
 import { MdDelete } from "react-icons/md";
 import { Skeleton } from "@/components/ui/skeleton"
 import SubmitButton from "@/components/ui/submit_button"
@@ -45,7 +46,7 @@ type PlaylistInput = {
 const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ playlist, className, ...props }, ref) => {
     const [setToasterMessage] = useToastMessage();
     const queryClient = useQueryClient();
-    
+
     const playlistVideos = useQuery({
         queryKey: [`playlistVideos-${playlist.id}`],
         queryFn: async () => (await getVideos({ playlist_id: playlist.id }, 4))?.data
@@ -70,36 +71,53 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
 
     const [isEditable, setIsEditable] = React.useState(false);
 
-    return playlistVideos.data?.length ? (
+    return playlistVideos.data && (
         <Card ref={ref} className={cn("w-full flex flex-col gap-2 overflow-hidden p-3", className)} {...props}>
-            <CardContent className="p-0 grid grid-cols-2 gap-1">
-                {playlistVideos.data.map((video, index) => (
-                    <Image
-                        key={index}
-                        src={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
-                        alt={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
-                        placeholder="blur"
-                        blurDataURL={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
-                        height={100}
-                        width={500}
-                        className="rounded object-cover" />
-                ))}
-
-                {(!!playlistVideos.data.length && playlistVideos.data.length < 4)
-                    && Array(4 - playlistVideos.data.length).fill(null).map((e, index) => (
+            <Link href={`/videos?playlist_id=${playlist.id}`} prefetch={true}>
+                <CardContent className="p-0 grid grid-cols-2 gap-1">
+                    {playlistVideos.data.map((video, index) => (
                         <Image
                             key={index}
-                            src={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
-                            alt={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                            src={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                            alt={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
                             placeholder="blur"
-                            blurDataURL={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                            blurDataURL={video?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
                             height={100}
                             width={500}
-                            className="rounded object-cover"
-                        />
-                    ))
-                }
-            </CardContent>
+                            className="rounded object-cover" />
+                    ))}
+
+                    {(!!playlistVideos.data.length && playlistVideos.data.length < 4)
+                        && Array(4 - playlistVideos.data.length).fill(null).map((e, index) => (
+                            <Image
+                                key={index}
+                                src={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                                alt={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                                placeholder="blur"
+                                blurDataURL={playlistVideos.data[0]?.thumbnails?.standard?.url ?? "https://github.com/shadcn.png"}
+                                height={100}
+                                width={500}
+                                className="rounded object-cover"
+                            />
+                        ))
+                    }
+
+                    {!playlistVideos.data.length && (
+                        Array(4).fill(null).map((e, index) => (
+                            <Image
+                                key={index}
+                                src={"https://github.com/shadcn.png"}
+                                alt={"https://github.com/shadcn.png"}
+                                placeholder="blur"
+                                blurDataURL={"https://github.com/shadcn.png"}
+                                height={100}
+                                width={200}
+                                className="rounded object-cover" />
+                        ))
+                    )}
+
+                </CardContent>
+            </Link>
 
             <CardFooter className="flex-col items-start py-0 px-0">
                 {isEditable ?
@@ -138,7 +156,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
             </CardFooter>
         </Card>
 
-    ) : (<PlaylistCardSkeleton />)
+    )
 })
 
 PlaylistCard.displayName = "PlaylistCard"
@@ -146,15 +164,4 @@ PlaylistCard.displayName = "PlaylistCard"
 export default PlaylistCard
 
 
-const PlaylistCardSkeleton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-
-        <div ref={ref} className={cn("flex flex-col gap-2", className)} {...props}>
-            <Skeleton className="w-full h-[15rem]" />
-            <Skeleton className="h-5 w-[70%] " />
-            <Skeleton className="h-5 w-20 " />
-        </div>
-    ))
-
-PlaylistCardSkeleton.displayName = "PlaylistCardSkeleton"
 

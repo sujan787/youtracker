@@ -73,7 +73,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
 
     return playlistVideos.data && (
         <Card ref={ref} className={cn("w-full flex flex-col gap-2 overflow-hidden p-3", className)} {...props}>
-            <Link href={`/videos?playlist_id=${playlist.id}`}>
+            <Link href={`/videos?playlist_id=${playlist.id}`} prefetch={true}>
                 <CardContent className="p-0 grid grid-cols-2 gap-1">
                     {playlistVideos.data.map((video, index) => (
                         <Image

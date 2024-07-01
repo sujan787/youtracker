@@ -15,7 +15,8 @@ const useToastMessage = () => {
         if (toasterMessage.error) {
             toast({
                 variant: "destructive",
-                title: "Uh oh! Something went wrong.",
+                color: "red",
+                title: "Uh oh! Something went wrong. 😢",
                 description: toasterMessage.error,
                 action: <ToastAction className='border rounded-md px-2 py-1' altText="Try again">Try again</ToastAction>,
             })
@@ -23,7 +24,8 @@ const useToastMessage = () => {
 
         if (toasterMessage.success) {
             toast({
-                title: "Scheduled: Catch up ",
+                variant: "destructive",
+                title: "Hey do you know 🙂",
                 description: toasterMessage.success,
                 action: (
                     <ToastAction className='border rounded-md px-2 py-1' altText="Goto schedule to undo">Undo</ToastAction>

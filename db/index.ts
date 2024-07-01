@@ -6,6 +6,7 @@ import schema from "./schema";
 
 dotenv.config();
 
+
 // create the connection
 const connection = connect({
     url: process.env.DATABASE_URL

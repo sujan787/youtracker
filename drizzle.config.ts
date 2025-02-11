@@ -1,12 +1,19 @@
-import type { Config } from "drizzle-kit";
+
+import { defineConfig } from 'drizzle-kit';
+
 import * as dotenv from "dotenv";
 dotenv.config();
 
-export default {
-    schema: "./db/schema",
+
+export const DB_URL = process.env.DATABASE_URL as string
+
+export default defineConfig({
+    schema:  "./db/schema",
     out: "./drizzle",
-    driver: 'mysql2',
+    dialect: 'postgresql',
     dbCredentials: {
-        connectionString: `${process.env.DATABASE_URL}`,
-    }
-} satisfies Config;
+        url: DB_URL as string
+    },
+    verbose: true,
+    strict: true,
+});

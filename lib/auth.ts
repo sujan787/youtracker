@@ -1,15 +1,18 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { DrizzleAdapter } from "@/services/drizzle_adapter_service";
+
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, } from "next-auth";
 import { compare } from "bcryptjs";
 import { db } from "@/db";
 import { getUserByEmail } from "@/services/user_service.DB";
 import { sendEmailVerificationMail } from "@/server_actions/mail_action";
 
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
+
 export const authOptions: NextAuthOptions = {
     adapter: DrizzleAdapter(db) as any,
+    
 
     providers: [
         CredentialsProvider({

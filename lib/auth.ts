@@ -12,6 +12,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 
 export const authOptions: NextAuthOptions = {
     adapter: DrizzleAdapter(db) as any,
+    
 
     providers: [
         CredentialsProvider({

@@ -12,7 +12,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 
 export const authOptions: NextAuthOptions = {
     adapter: DrizzleAdapter(db) as any,
-    
+
 
     providers: [
         CredentialsProvider({
@@ -45,26 +45,26 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
 
-    callbacks: {
-        async jwt({ token }) {
-            if (!token?.email) return token;
-            const auth: any = await getUserByEmail(token.email)
-            if (!auth) return token;
-            token = auth;
-            return token;
-        },
+    // callbacks: {
+    //     async jwt({ token }) {
+    //         if (!token?.email) return token;
+    //         const auth: any = await getUserByEmail(token.email)
+    //         if (!auth) return token;
+    //         token = auth;
+    //         return token;
+    //     },
 
-        async session({ session, }) {
-            if (!session?.user?.email) return session;
-            const auth = await getUserByEmail(session.user.email)
-            session.user = auth as any
-            return session
-        },
-    },
+    //     async session({ session, }) {
+    //         if (!session?.user?.email) return session;
+    //         const auth = await getUserByEmail(session.user.email)
+    //         session.user = auth as any
+    //         return session
+    //     },
+    // },
 
     pages: {
         signIn: '/login',
-        error: '/api/auth/error',
+        // error: '/api/auth/error',
     }
 };
 

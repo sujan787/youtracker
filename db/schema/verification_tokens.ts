@@ -10,4 +10,5 @@ export const verificationTokens = pgTable(
     (vt) => ({
         compoundKey: primaryKey(vt.identifier, vt.token),
     })
+    
 )

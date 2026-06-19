@@ -38,10 +38,12 @@ const Page = () => {
         resolver: yupResolver(registerSchema)
     })
 
-    const handleSubmitMutation = useMutation(async (formData: SignUpFormInput) => {
-        const status = await createUser(formData);
-        if (status.is_ok) { await signIn("email", { ...formData, redirect: false }) };
-        return { ...status, user: formData };
+    const handleSubmitMutation = useMutation({
+        mutationFn: async (formData: SignUpFormInput) => {
+            const status = await createUser(formData);
+            if (status.is_ok) { await signIn("email", { ...formData, redirect: false }) };
+            return { ...status, user: formData };
+        }
     })
 
     React.useEffect(() => {
@@ -51,15 +53,15 @@ const Page = () => {
             redirect(`/verify-email/${handleSubmitMutation.data.user.email}`);
     }, [handleSubmitMutation.data])
 
-    return <Section className="h-screen items-center justify-center">
-        <Card className="w-[350px]">
+    return <Section className="min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-sm shadow-lg">
             <CardHeader>
-                <CardTitle className="text-center">Create Account</CardTitle>
-                <CardDescription className="text-center">Use all Seo Tools from one place</CardDescription>
+                <CardTitle className="text-center text-2xl">Create your account</CardTitle>
+                <CardDescription className="text-center">Start saving YouTube videos for later</CardDescription>
             </CardHeader>
             <CardContent>
-                <Button onClick={() => signIn("google")} variant={`outline`} className="font-semibold flex gap-3 w-full">
-                    <FcGoogle size={25} />Sign in with Google</Button>
+                <Button onClick={() => signIn("google", { callbackUrl: "/videos" })} variant={`outline`} className="font-medium flex gap-3 w-full h-11">
+                    <FcGoogle size={22} />Continue with Google</Button>
 
                 <div className="flex items-center my-5">
                     <hr className="flex-1" />
@@ -71,29 +73,29 @@ const Page = () => {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="name">Name</Label>
-                            <Input disabled={handleSubmitMutation.isLoading} id="name" placeholder="Enter your first name" {...register("name")} />
+                            <Input disabled={handleSubmitMutation.isPending} id="name" placeholder="Enter your first name" {...register("name")} />
                             <Error position="right" message={errors.name?.message} />
                         </div>
 
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="email">Email</Label>
-                            <Input disabled={handleSubmitMutation.isLoading} id="email" placeholder="Enter your email" {...register("email")} />
+                            <Input disabled={handleSubmitMutation.isPending} id="email" placeholder="Enter your email" {...register("email")} />
                             <Error position="right" message={errors.email?.message} />
                         </div>
 
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="password">Password</Label>
-                            <Input disabled={handleSubmitMutation.isLoading} type="password" id="password" placeholder="Enter your password" {...register("password")} />
+                            <Input disabled={handleSubmitMutation.isPending} type="password" id="password" placeholder="Enter your password" {...register("password")} />
                             <Error position="right" message={errors.password?.message} />
                         </div>
 
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="confirm_password">Confirm Password</Label>
-                            <Input disabled={handleSubmitMutation.isLoading} type="password" id="confirm_password" placeholder="Confirm your password" {...register("confirm_password")} />
+                            <Input disabled={handleSubmitMutation.isPending} type="password" id="confirm_password" placeholder="Confirm your password" {...register("confirm_password")} />
                             <Error position="right" message={errors.confirm_password?.message} />
                         </div>
 
-                        <SubmitButton isLoading={handleSubmitMutation.isLoading} className="w-full relative">Sign Up</SubmitButton>
+                        <SubmitButton isLoading={handleSubmitMutation.isPending} className="w-full relative">Sign Up</SubmitButton>
                     </div>
                 </form>
             </CardContent>

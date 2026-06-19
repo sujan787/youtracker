@@ -83,7 +83,7 @@ const generateMailTemplate = (
     body: string,
     callbackName: string,
     callbackUrl: string
-): string => {
+): Promise<string> => {
     return render(
         <MailTemplate
             subject={subject}

@@ -40,9 +40,11 @@ const Card: FC<CardProps> = ({ email }) => {
         resolver: yupResolver(emailVerificationSchema)
     })
 
-    const handleSubmitMutation = useMutation(async (formData: { email: string }) => {
-        const status = await signIn("email", { email: formData.email, redirect: false });
-        return status;
+    const handleSubmitMutation = useMutation({
+        mutationFn: async (formData: { email: string }) => {
+            const status = await signIn("email", { email: formData.email, redirect: false });
+            return status;
+        }
     })
 
     React.useEffect(() => {
@@ -52,7 +54,7 @@ const Card: FC<CardProps> = ({ email }) => {
     }, [handleSubmitMutation.data])
 
     return (<>
-        <BoxCard className="w-[350px] md:w-[450px] lg:w-[450px]">
+        <BoxCard className="w-full max-w-md mx-4 shadow-lg">
             <CardHeader>
                 <CardTitle className="text-center">
                     Verify Your Email
@@ -65,7 +67,7 @@ const Card: FC<CardProps> = ({ email }) => {
                     <TooltipTrigger asChild>
                         <SubmitButton className="w-full relative"
                             onClick={handleSubmit((data) => handleSubmitMutation.mutate(data))}
-                            isLoading={handleSubmitMutation.isLoading}>Resend Verification Mail
+                            isLoading={handleSubmitMutation.isPending}>Resend Verification Mail
                         </SubmitButton>
                     </TooltipTrigger>
                     <TooltipContent>

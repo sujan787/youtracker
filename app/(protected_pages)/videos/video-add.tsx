@@ -63,10 +63,11 @@ const VideoAdd = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 
         const form = useForm<AddVideoFormInput>({
             defaultValues: { url: "", playlist_id: "", playlist_name: "" },
-            resolver: yupResolver(videoAddSchema)
+            resolver: yupResolver(videoAddSchema) as any
         })
 
-        const handleSubmitMutation = useMutation(async (formData: AddVideoFormInput) => {
+        const handleSubmitMutation = useMutation({
+            mutationFn: async (formData: AddVideoFormInput) => {
             const status = await saveVideo(formData)
 
             const videoQuery = queryClient.getQueryData(
@@ -83,7 +84,7 @@ const VideoAdd = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
             form.reset()
 
             return status;
-        })
+        }})
 
         React.useEffect(() => {
             if (!handleSubmitMutation.data) return;
@@ -94,10 +95,10 @@ const VideoAdd = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
             <div ref={ref} className={cn("", className)} {...props}>
                 <Dialog>
                     <DialogTrigger className="hover:bg-accent">
-                        {handleSubmitMutation.isLoading ?
+                        {handleSubmitMutation.isPending ?
                             <ClipLoader
                                 color={"black"}
-                                loading={handleSubmitMutation.isLoading}
+                                loading={handleSubmitMutation.isPending}
                                 size={20}
                                 aria-label="Loading Spinner"
                                 data-testid="loader"
@@ -180,7 +181,7 @@ const VideoAdd = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
                                 </div>
                                 <DialogFooter>
                                     <DialogClose asChild>
-                                        <SubmitButton type="submit" isLoading={handleSubmitMutation.isLoading}>Save</SubmitButton>
+                                        <SubmitButton type="submit" isLoading={handleSubmitMutation.isPending}>Save</SubmitButton>
                                     </DialogClose>
                                 </DialogFooter>
                             </Form>

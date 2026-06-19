@@ -46,25 +46,26 @@ const VideoCard = React.forwardRef<HTMLDivElement, VideoCardProps>(({ info, clas
     return (
         <Dialog>
 
-            <Card ref={ref} className={cn("w-full flex flex-col gap-2 border-none overflow-hidden shadow-none", className)} {...props}>
-                <DialogTrigger>
-                    <CardContent className="p-0 relative">
+            <Card ref={ref} className={cn("group w-full flex flex-col gap-2 border-none overflow-hidden shadow-none bg-transparent", className)} {...props}>
+                <DialogTrigger className="cursor-pointer">
+                    <CardContent className="p-0 relative overflow-hidden rounded-xl ring-1 ring-border">
                         <Image
                             src={thumbnail}
-                            alt={thumbnail}
+                            alt={info.title ?? "video thumbnail"}
                             placeholder="blur"
                             blurDataURL={thumbnail}
                             height={100}
                             width={400}
-                            className="rounded object-cover transition duration-200 ease-in transform sm:hover:scale-105" />
+                            className="aspect-video w-full rounded-xl object-cover transition duration-300 ease-out group-hover:scale-105" />
+                        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                     </CardContent>
                 </DialogTrigger>
-                <CardFooter className="flex justify-between items-start gap-1 py-2 px-1">
-                    <div className="flex flex-col items-start ">
-                        <p className=" text-start">{info.title ? info.title.substring(0, 30) : "No Title Found"}</p>
-                        <small className=" text-muted-foreground">{info.channel_title}</small>
+                <CardFooter className="flex justify-between items-start gap-2 py-1 px-1">
+                    <div className="flex flex-col items-start min-w-0">
+                        <p className="text-start text-sm font-medium leading-snug line-clamp-2">{info.title ? info.title : "No Title Found"}</p>
+                        <small className="text-muted-foreground truncate max-w-full">{info.channel_title}</small>
                     </div>
-                    <Actions className="" info={info} />
+                    <Actions className="shrink-0" info={info} />
                 </CardFooter>
             </Card>
 

@@ -15,7 +15,7 @@ export const sendEmailVerificationMail = async (email: string, url: string)
     const callbackName = "Click Here";
     const subject = "Email Verification";
     const body = `Hello,${user.name}, Please Verify your Email`;
-    const template = generateMailTemplate(subject, body, callbackName, callbackUrl);
+    const template = await generateMailTemplate(subject, body, callbackName, callbackUrl);
 
     try {
         await sendMail(user.email, "Email Verification", template);

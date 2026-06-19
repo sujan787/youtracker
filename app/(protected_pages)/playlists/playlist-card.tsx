@@ -56,23 +56,27 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
         defaultValues: { name: playlist.name }, resolver: yupResolver(playlistAddSchema)
     })
 
-    const handleSubmitMutation = useMutation(async (formData: PlaylistInput) => {
-        const status = await updatePlaylist(playlist.id, formData)
-        setIsEditable(false);
-        setToasterMessage(status.message)
-        queryClient.invalidateQueries({ queryKey: ["play-lists"] });
+    const handleSubmitMutation = useMutation({
+        mutationFn: async (formData: PlaylistInput) => {
+            const status = await updatePlaylist(playlist.id, formData)
+            setIsEditable(false);
+            setToasterMessage(status.message)
+            queryClient.invalidateQueries({ queryKey: ["play-lists"] });
+        }
     })
 
-    const deletePlaylistMutation = useMutation(async (playlistId: string) => {
-        const status = await deletePlaylist(playlist.id)
-        setToasterMessage(status.message)
-        queryClient.invalidateQueries({ queryKey: ["play-lists"] });
+    const deletePlaylistMutation = useMutation({
+        mutationFn: async (playlistId: string) => {
+            const status = await deletePlaylist(playlist.id)
+            setToasterMessage(status.message)
+            queryClient.invalidateQueries({ queryKey: ["play-lists"] });
+        }
     })
 
     const [isEditable, setIsEditable] = React.useState(false);
 
     return playlistVideos.data && (
-        <Card ref={ref} className={cn("w-full flex flex-col gap-2 overflow-hidden p-3", className)} {...props}>
+        <Card ref={ref} className={cn("w-full flex flex-col gap-2 overflow-hidden p-3 rounded-xl transition-shadow hover:shadow-md", className)} {...props}>
             <Link href={`/videos?playlist_id=${playlist.id}`} prefetch={true}>
                 <CardContent className="p-0 grid grid-cols-2 gap-1">
                     {playlistVideos.data.map((video, index) => (
@@ -126,7 +130,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
                             <Input id="playlist-name " placeholder="Enter the playlist name" {...register("name")} />
                         </div>
 
-                        <SubmitButton isLoading={handleSubmitMutation.isLoading} >
+                        <SubmitButton isLoading={handleSubmitMutation.isPending} >
                             <IoCheckmarkDoneOutline size={20} />
                         </SubmitButton>
 
@@ -136,8 +140,8 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
                     </form>
                     :
                     <div className="flex items-center justify-between w-full">
-                        <div className="p-2">
-                            <p className=" font-semibold uppercase text-muted-foreground">{playlist.name}</p>
+                        <div className="p-2 min-w-0">
+                            <p className="font-semibold capitalize truncate">{playlist.name}</p>
                         </div>
 
                         <div className="flex gap-2">
@@ -145,7 +149,7 @@ const PlaylistCard = React.forwardRef<HTMLDivElement, PlaylistCardProps>(({ play
                                 <FaRegEdit size={20} />
                             </Button>
 
-                            <SubmitButton isLoading={deletePlaylistMutation.isLoading}
+                            <SubmitButton isLoading={deletePlaylistMutation.isPending}
                                 onClick={() => deletePlaylistMutation.mutate(playlist.id)}
                                 className="border border-red-400 text-red-400 hover:bg-red-400 hover:text-white" variant="outline">
                                 <MdDelete size={20} />

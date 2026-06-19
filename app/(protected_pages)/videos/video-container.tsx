@@ -35,9 +35,10 @@ const VideoContainer = React.forwardRef<HTMLDivElement, VideoContainerProps>(
 
         const videosQuery = useInfiniteQuery({
             queryKey: ["videos", `${data.keyword}-${data.playlist_id}`],
-            queryFn: async ({ pageParam = 1 }) => {
+            queryFn: async ({ pageParam }) => {
                 return (await getVideos({ ...data, pagination: pageParam }))?.data
             },
+            initialPageParam: 1,
             getNextPageParam: (_, allPages) => allPages.length + 1,
         })
 

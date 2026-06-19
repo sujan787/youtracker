@@ -18,7 +18,11 @@ const Page = () => {
 
     return (
         <Main className="flex-1">
-            <div className="grid md:grid-cols-4 gap-3">
+            <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Your Playlists</h1>
+                <p className="text-muted-foreground text-sm mt-1">Organize your saved videos into collections.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {playlists.data ? playlists.data.map((playlist, index) => (
                     <PlaylistCard key={index} playlist={playlist} />
                 )) :

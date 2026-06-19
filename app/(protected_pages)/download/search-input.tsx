@@ -32,11 +32,13 @@ const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             resolver: yupResolver(downloadInputSchema)
         })
 
-        const handleSubmitMutation = useMutation(async (formData: DownloadInput) => {
-            const videoId = await extractYouTubeVideoId(formData.url)
-            if (!videoId.length) return { error: "Url Must be a Youtube Url" }
-            setUrl(formData.url);
-            setYoutubeVideoId(videoId)
+        const handleSubmitMutation = useMutation({
+            mutationFn: async (formData: DownloadInput) => {
+                const videoId = await extractYouTubeVideoId(formData.url)
+                if (!videoId.length) return { error: "Url Must be a Youtube Url" }
+                setUrl(formData.url);
+                setYoutubeVideoId(videoId)
+            }
         })
 
         React.useEffect(() => {

@@ -49,8 +49,10 @@ const VideoSearchBar = React.forwardRef<HTMLDivElement, VideoSearchBarProps>(
 
         form.watch((data, { name, type }) => setData(data))
 
-        const handleSubmitMutation = useMutation(async (data: VideoSearchInput) => {
-            return { redirect_url: `/videos?keyword=${data.keyword}&playlist_id=${data.playlist_id}` }
+        const handleSubmitMutation = useMutation({
+            mutationFn: async (data: VideoSearchInput) => {
+                return { redirect_url: `/videos?keyword=${data.keyword}&playlist_id=${data.playlist_id}` }
+            }
         })
 
         const setAsDefaultSearchParams = () => setValue(data)

@@ -14,9 +14,11 @@ export function useGlobalState<T>(key: string, initialState?: T): [T | undefined
     const queryClient = useQueryClient();
 
     const stateKey = [GLOBAL_STATE_KEY_PREFIX, key];
-    const { data } = useQuery(stateKey, () => initialState, {
+    const { data } = useQuery({
+        queryKey: stateKey,
+        queryFn: () => initialState as T,
         initialData: initialState,
-        staleTime: Infinity
+        staleTime: Infinity,
     });
 
     const setData = (newState: T) => {
